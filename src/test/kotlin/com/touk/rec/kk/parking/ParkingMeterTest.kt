@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 class ParkingMeterTest {
     private val repository = InMemoryParkingMeterRepository()
-    private val currentTimeProvider = mock<CurrentTimeProvider>{
+    private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
     }
     private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider)
@@ -68,6 +68,11 @@ class ParkingMeterTest {
         assert(repository.find(PLATE_NUMBER_ONE)!!.endDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `should throw illegal argument exception when trying to stop not started meter`() {
+        parkingManager.stopMeter(PLATE_NUMBER_TOW)
+    }
+
     companion object {
         private const val PLATE_NUMBER_ONE = "wn1111"
         private const val PLATE_NUMBER_TOW = "wn2222"
@@ -103,7 +108,7 @@ class SimpleParkingMeter(
 
     override fun stopMeter(plateNumber: String) {
         val meterRecord = repository.find(plateNumber)
-        check(meterRecord?.isRunning ?: false)
+        require(meterRecord?.isRunning ?: false)
         repository.save(meterRecord!!.copy(endDate = currentTimeProvider.getCurrentLocalDateTime()))
     }
 }
