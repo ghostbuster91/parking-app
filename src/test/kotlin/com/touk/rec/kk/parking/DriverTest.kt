@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import org.junit.Test
+import java.lang.IllegalStateException
 
 class DriverTest {
 
@@ -34,12 +35,20 @@ class DriverTest {
         parkingManager.stopMeter("wn1111")
         assert(parkingManager.checkMeter("wn1111")).isFalse()
     }
+
+    @Test(expected = IllegalStateException::class)
+    fun `driver cannot start parking meter twice`() {
+        val parkingManager = SimpleParkingManager()
+        parkingManager.startMeter("wn1111")
+        parkingManager.startMeter("wn1111")
+    }
 }
 
 class SimpleParkingManager : ParkingManager {
     private val startedPlates = mutableListOf<String>()
 
     override fun startMeter(plateNumber: String) {
+        check(!startedPlates.contains(plateNumber))
         startedPlates.add(plateNumber)
     }
 
