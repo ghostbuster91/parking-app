@@ -12,6 +12,9 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    
+    testCompile "junit:junit:4.11"
+    testCompile 'com.willowtreeapps.assertk:assertk-jvm:0.12'
 }
 
 compileKotlin {
