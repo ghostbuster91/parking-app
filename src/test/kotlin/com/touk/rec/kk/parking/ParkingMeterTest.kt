@@ -19,57 +19,62 @@ class ParkingMeterTest {
 
     @Test
     fun `parkingMeter should not be started at the begging`() {
-        assert(parkingManager.checkMeter("wn1111")).isFalse()
+        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isFalse()
     }
 
     @Test
     fun `after starting parking meter it should be started for given plate`() {
-        parkingManager.startMeter("wn1111")
-        assert(parkingManager.checkMeter("wn1111")).isTrue()
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isTrue()
     }
 
     @Test
     fun `after staring parking meter for one car it should not be stared for other`() {
-        parkingManager.startMeter("wn1111")
-        assert(parkingManager.checkMeter("wn2222")).isFalse()
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        assert(parkingManager.checkMeter(PLATE_NUMBER_TOW)).isFalse()
     }
 
     @Test
     fun `driver can stop parking meter if it was started`() {
-        parkingManager.startMeter("wn1111")
-        parkingManager.stopMeter("wn1111")
-        assert(parkingManager.checkMeter("wn1111")).isFalse()
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        parkingManager.stopMeter(PLATE_NUMBER_ONE)
+        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isFalse()
     }
 
     @Test(expected = IllegalStateException::class)
     fun `driver cannot start parking meter twice`() {
-        parkingManager.startMeter("wn1111")
-        parkingManager.startMeter("wn1111")
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
     }
 
     @Test
     fun `parking meter should save to repository current time when starting meter`() {
-        parkingManager.startMeter("wn1111")
-        assert(repository.find("wn1111")!!.startDate).isEqualTo(LocalDateTime.MIN)
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        assert(repository.find(PLATE_NUMBER_ONE)!!.startDate).isEqualTo(LocalDateTime.MIN)
     }
 
     @Test
     fun `should use current time provider to obtain time when starting meter`() {
         whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
-        parkingManager.startMeter("wn1111")
-        assert(repository.find("wn1111")!!.startDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        assert(repository.find(PLATE_NUMBER_ONE)!!.startDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
     }
 
     @Test
     fun `should use current time provider to obtain time when stopping meter`() {
-        parkingManager.startMeter("wn1111")
+        parkingManager.startMeter(PLATE_NUMBER_ONE)
         whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
-        parkingManager.stopMeter("wn1111")
-        assert(repository.find("wn1111")!!.endDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
+        parkingManager.stopMeter(PLATE_NUMBER_ONE)
+        assert(repository.find(PLATE_NUMBER_ONE)!!.endDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
+    }
+
+    companion object {
+        private const val PLATE_NUMBER_ONE = "wn1111"
+        private const val PLATE_NUMBER_TOW = "wn2222"
     }
 }
 
-class InMemoryParkingMeterRepository : ParkingMeterRepository {
+private class InMemoryParkingMeterRepository : ParkingMeterRepository {
     private val data = mutableMapOf<String, ParkingMeterRecord>()
 
     override fun save(parkingMeterRecord: ParkingMeterRecord) {
