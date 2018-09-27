@@ -19,16 +19,23 @@ class DriverTest {
         parkingManager.startMeter("wn1111")
         assert(parkingManager.checkMeter("wn1111")).isTrue()
     }
+
+    @Test
+    fun `after staring parking meter for one car it should not be stared for other`() {
+        val parkingManager = SimpleParkingManager()
+        parkingManager.startMeter("wn1111")
+        assert(parkingManager.checkMeter("wn2222")).isFalse()
+    }
 }
 
 class SimpleParkingManager : ParkingManager {
-    private var started = false
+    private val startedPlates = mutableListOf<String>()
 
     override fun startMeter(plateNumber: String) {
-        started = true
+        startedPlates.add(plateNumber)
     }
 
     override fun checkMeter(plateNumber: String): Boolean {
-        return started
+        return startedPlates.contains(plateNumber)
     }
 }
