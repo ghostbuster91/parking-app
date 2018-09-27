@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
 import java.math.BigDecimal
+import java.time.Duration
 import java.time.LocalDateTime
 
 class PaymentCalculatorTest {
@@ -24,8 +25,18 @@ class PaymentCalculatorTest {
         whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusMinutes(30)))
         assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal.ONE)
 
-        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusMinutes(60)))
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusHours(1)))
         assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal.ONE)
+    }
+
+    @Test
+    fun `should return 3 PLN if parking time is less or equal to two hours for completed parking`() {
+        val startTime = LocalDateTime.MIN
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusMinutes(61)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(3))
+
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusHours(2)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(3))
     }
 
     companion object {
@@ -35,6 +46,16 @@ class PaymentCalculatorTest {
 
 class PaymentCalculator(private val repository: ParkingMeterRepository) {
     fun calculateTotal(plateNumber: String): BigDecimal {
-        return if (repository.find(plateNumber) != null) BigDecimal.ONE else BigDecimal.ZERO
+        val meterRecord = repository.find(plateNumber) ?: return BigDecimal.ZERO
+        val totalHours = Duration.between(meterRecord.startDate, meterRecord.endDate!!.plusMinutes(59)).toHours()
+        return (1..totalHours)
+                .map {
+                    when {
+                        it <= 1 -> BigDecimal.ONE
+                        it in 2..2 -> BigDecimal(2)
+                        else -> TODO()
+                    }
+                }
+                .fold(BigDecimal.ZERO) { acc, item -> acc + item }
     }
 }
