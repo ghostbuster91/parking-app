@@ -26,6 +26,14 @@ class DriverTest {
         parkingManager.startMeter("wn1111")
         assert(parkingManager.checkMeter("wn2222")).isFalse()
     }
+
+    @Test
+    fun `driver can stop parking meter if it was started`() {
+        val parkingManager = SimpleParkingManager()
+        parkingManager.startMeter("wn1111")
+        parkingManager.stopMeter("wn1111")
+        assert(parkingManager.checkMeter("wn1111")).isFalse()
+    }
 }
 
 class SimpleParkingManager : ParkingManager {
@@ -37,5 +45,9 @@ class SimpleParkingManager : ParkingManager {
 
     override fun checkMeter(plateNumber: String): Boolean {
         return startedPlates.contains(plateNumber)
+    }
+
+    override fun stopMeter(plateNumber: String) {
+        startedPlates.remove(plateNumber)
     }
 }
