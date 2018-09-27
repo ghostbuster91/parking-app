@@ -45,18 +45,18 @@ class DriverTest {
 }
 
 class SimpleParkingManager : ParkingManager {
-    private val startedPlates = mutableListOf<String>()
+    private val startedMeters = mutableListOf<String>()
 
     override fun startMeter(plateNumber: String) {
-        check(!startedPlates.contains(plateNumber))
-        startedPlates.add(plateNumber)
+        check(!startedMeters.contains(plateNumber))
+        startedMeters.add(plateNumber)
     }
 
     override fun checkMeter(plateNumber: String): Boolean {
-        return startedPlates.contains(plateNumber)
+        return startedMeters.contains(plateNumber)
     }
 
     override fun stopMeter(plateNumber: String) {
-        startedPlates.remove(plateNumber)
+        startedMeters.remove(plateNumber)
     }
 }
