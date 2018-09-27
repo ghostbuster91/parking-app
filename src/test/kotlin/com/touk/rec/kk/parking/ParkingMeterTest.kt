@@ -4,12 +4,18 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
 import java.time.LocalDateTime
 
 class ParkingMeterTest {
     private val repository = InMemoryParkingMeterRepository()
-    private val parkingManager = SimpleParkingMeter(repository)
+    private val currentTimeProvider = mock<CurrentTimeProvider>{
+        on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
+    }
+    private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider)
 
     @Test
     fun `parkingMeter should not be started at the begging`() {
@@ -46,6 +52,13 @@ class ParkingMeterTest {
         parkingManager.startMeter("wn1111")
         assert(repository.find("wn1111")!!.startDate).isEqualTo(LocalDateTime.MIN)
     }
+
+    @Test
+    fun `parking meter should use current time provider to obtain time when starting meter`() {
+        whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
+        parkingManager.startMeter("wn1111")
+        assert(repository.find("wn1111")!!.startDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
+    }
 }
 
 class InMemoryParkingMeterRepository : ParkingMeterRepository {
@@ -60,11 +73,14 @@ class InMemoryParkingMeterRepository : ParkingMeterRepository {
     }
 }
 
-class SimpleParkingMeter(private val repository: ParkingMeterRepository) : ParkingMeter {
+class SimpleParkingMeter(
+        private val repository: ParkingMeterRepository,
+        private val currentTimeProvider: CurrentTimeProvider
+) : ParkingMeter {
 
     override fun startMeter(plateNumber: String) {
         check(!checkMeter(plateNumber))
-        repository.save(ParkingMeterRecord(plateNumber, LocalDateTime.MIN, null))
+        repository.save(ParkingMeterRecord(plateNumber, currentTimeProvider.getCurrentLocalDateTime(), null))
     }
 
     override fun checkMeter(plateNumber: String): Boolean {
