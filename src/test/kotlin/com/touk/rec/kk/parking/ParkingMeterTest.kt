@@ -54,10 +54,18 @@ class ParkingMeterTest {
     }
 
     @Test
-    fun `parking meter should use current time provider to obtain time when starting meter`() {
+    fun `should use current time provider to obtain time when starting meter`() {
         whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
         parkingManager.startMeter("wn1111")
         assert(repository.find("wn1111")!!.startDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
+    }
+
+    @Test
+    fun `should use current time provider to obtain time when stopping meter`() {
+        parkingManager.startMeter("wn1111")
+        whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
+        parkingManager.stopMeter("wn1111")
+        assert(repository.find("wn1111")!!.endDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
     }
 }
 
@@ -91,6 +99,6 @@ class SimpleParkingMeter(
     override fun stopMeter(plateNumber: String) {
         val meterRecord = repository.find(plateNumber)
         check(meterRecord?.isRunning ?: false)
-        repository.save(meterRecord!!.copy(endDate = LocalDateTime.MIN))
+        repository.save(meterRecord!!.copy(endDate = currentTimeProvider.getCurrentLocalDateTime()))
     }
 }
