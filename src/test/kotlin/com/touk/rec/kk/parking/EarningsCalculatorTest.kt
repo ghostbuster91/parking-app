@@ -27,6 +27,16 @@ class EarningsCalculatorTest {
         whenever(paymentCalculator.calculateTotal(meterRecord)).thenReturn(BigDecimal.TEN)
         assert(calculator.getEarnings(LocalDate.MIN)).isEqualTo(BigDecimal.TEN)
     }
+
+    @Test
+    fun `should sum earnings from each parking record for given day`() {
+        val meterRecordFirst = ParkingMeterRecord("wn1111", LocalDateTime.MIN, LocalDateTime.MIN.plusHours(3), DriverType.REGULAR)
+        val meterRecordSecond = ParkingMeterRecord("wn2222", LocalDateTime.MIN, LocalDateTime.MIN.plusHours(3), DriverType.DISABLED)
+        whenever(repository.getCompletedRecords(LocalDate.MIN)).thenReturn(listOf(meterRecordFirst, meterRecordSecond))
+        whenever(paymentCalculator.calculateTotal(meterRecordFirst)).thenReturn(BigDecimal.TEN)
+        whenever(paymentCalculator.calculateTotal(meterRecordSecond)).thenReturn(BigDecimal.valueOf(6.66))
+        assert(calculator.getEarnings(LocalDate.MIN)).isEqualTo(BigDecimal.TEN + BigDecimal.valueOf(6.66))
+    }
 }
 
 class EarningsCalculator(
@@ -35,7 +45,9 @@ class EarningsCalculator(
 ) {
     fun getEarnings(date: LocalDate): BigDecimal {
         val completedRecords = repository.getCompletedRecords(date)
-        return completedRecords.firstOrNull()?.let { paymentCalculator.calculateTotal(it) } ?: BigDecimal.ZERO
+        return completedRecords
+                .map { paymentCalculator.calculateTotal(it) }
+                .fold(BigDecimal.ZERO) {acc, item -> acc + item }
     }
 
     interface ParkingMeterRepository {
