@@ -8,8 +8,9 @@ class PaymentCalculatorImpl(
         private val currentTimeProvider: CurrentTimeProvider
 ) : PaymentCalculator {
     override fun calculateTotal(meterRecord: ParkingMeterRecord): BigDecimal {
-        with(meterRecord) { require(startDate.isBefore(endDate)) }
-        val upperTimeLimit = (meterRecord.endDate ?: currentTimeProvider.getCurrentLocalDateTime()).plusMinutes(59)
+        val currentTime = currentTimeProvider.getCurrentLocalDateTime()
+        with(meterRecord) { require(startDate.isBefore(endDate?: currentTime)) }
+        val upperTimeLimit = (meterRecord.endDate ?: currentTime).plusMinutes(59)
         val totalHours = Duration.between(meterRecord.startDate, upperTimeLimit).toHours().toInt()
         return (1..totalHours)
                 .fold(listOf<BigDecimal>()) { acc, item ->
