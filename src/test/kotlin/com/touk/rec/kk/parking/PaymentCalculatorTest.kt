@@ -39,6 +39,26 @@ class PaymentCalculatorTest {
         assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(3))
     }
 
+    @Test
+    fun `should return 6 PLN if parking time is less or equal to three hours for completed parking`() {
+        val startTime = LocalDateTime.MIN
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusMinutes(121)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(6).setScale(2))
+
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusHours(3)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(6).setScale(2))
+    }
+
+    @Test
+    fun `should return 10,50 PLN if parking time is less or equal to four hours for completed parking`() {
+        val startTime = LocalDateTime.MIN
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusMinutes(181)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(10.5).setScale(2))
+
+        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, startTime.plusHours(4)))
+        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(BigDecimal(10.5).setScale(2))
+    }
+
     companion object {
         private const val PLATE_NUMBER_ONE = "wn1111"
     }
@@ -47,15 +67,15 @@ class PaymentCalculatorTest {
 class PaymentCalculator(private val repository: ParkingMeterRepository) {
     fun calculateTotal(plateNumber: String): BigDecimal {
         val meterRecord = repository.find(plateNumber) ?: return BigDecimal.ZERO
-        val totalHours = Duration.between(meterRecord.startDate, meterRecord.endDate!!.plusMinutes(59)).toHours()
+        val totalHours = Duration.between(meterRecord.startDate, meterRecord.endDate!!.plusMinutes(59)).toHours().toInt()
         return (1..totalHours)
-                .map {
-                    when {
-                        it <= 1 -> BigDecimal.ONE
-                        it in 2..2 -> BigDecimal(2)
-                        else -> TODO()
+                .fold(listOf<BigDecimal>()) { acc, item ->
+                    acc + when {
+                        item <= 1 -> BigDecimal(1)
+                        item in 2..2 -> BigDecimal(2)
+                        else -> acc.last().multiply(BigDecimal(1.5)).setScale(2)
                     }
                 }
-                .fold(BigDecimal.ZERO) { acc, item -> acc + item }
+                .reduce { first, second -> first + second }
     }
 }
