@@ -2,10 +2,6 @@ package com.touk.rec.kk.parking.domain
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import com.touk.rec.kk.parking.domain.CurrentTimeProvider
-import com.touk.rec.kk.parking.domain.DriverType
-import com.touk.rec.kk.parking.domain.ParkingMeterRecord
-import com.touk.rec.kk.parking.domain.PaymentCalculatorImpl
 import org.junit.Test
 import java.time.LocalDateTime
 
