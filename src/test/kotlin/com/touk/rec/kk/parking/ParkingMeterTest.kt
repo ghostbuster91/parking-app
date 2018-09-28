@@ -24,45 +24,45 @@ class ParkingMeterTest {
 
     @Test
     fun `after starting parking meter it should be started for given plate`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isTrue()
     }
 
     @Test
     fun `after staring parking meter for one car it should not be stared for other`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         assert(parkingManager.checkMeter(PLATE_NUMBER_TOW)).isFalse()
     }
 
     @Test
     fun `driver can stop parking meter if it was started`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         parkingManager.stopMeter(PLATE_NUMBER_ONE)
         assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isFalse()
     }
 
     @Test(expected = IllegalStateException::class)
     fun `driver cannot start parking meter twice`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
+        startParkingMeter()
     }
 
     @Test
     fun `parking meter should save to repository current time when starting meter`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         assert(repository.find(PLATE_NUMBER_ONE)!!.startDate).isEqualTo(LocalDateTime.MIN)
     }
 
     @Test
     fun `should use current time provider to obtain time when starting meter`() {
         whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         assert(repository.find(PLATE_NUMBER_ONE)!!.startDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
     }
 
     @Test
     fun `should use current time provider to obtain time when stopping meter`() {
-        parkingManager.startMeter(PLATE_NUMBER_ONE)
+        startParkingMeter()
         whenever(currentTimeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.of(1, 2, 3, 4, 5))
         parkingManager.stopMeter(PLATE_NUMBER_ONE)
         assert(repository.find(PLATE_NUMBER_ONE)!!.endDate).isEqualTo(LocalDateTime.of(1, 2, 3, 4, 5))
@@ -71,6 +71,10 @@ class ParkingMeterTest {
     @Test(expected = IllegalArgumentException::class)
     fun `should throw illegal argument exception when trying to stop not started meter`() {
         parkingManager.stopMeter(PLATE_NUMBER_TOW)
+    }
+
+    private fun startParkingMeter() {
+        parkingManager.startMeter(PLATE_NUMBER_ONE, DriverType.REGULAR)
     }
 
     companion object {

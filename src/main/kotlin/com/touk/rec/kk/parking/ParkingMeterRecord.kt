@@ -6,7 +6,7 @@ data class ParkingMeterRecord(
         val plateNumber: String,
         val startDate: LocalDateTime,
         val endDate: LocalDateTime?,
-        val driverType: DriverType = DriverType.REGULAR
+        val driverType: DriverType
 ) {
     val isRunning = endDate == null
 }
