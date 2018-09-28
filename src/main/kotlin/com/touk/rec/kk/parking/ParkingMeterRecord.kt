@@ -5,7 +5,13 @@ import java.time.LocalDateTime
 data class ParkingMeterRecord(
         val plateNumber: String,
         val startDate: LocalDateTime,
-        val endDate: LocalDateTime?
+        val endDate: LocalDateTime?,
+        val driverType: DriverType = DriverType.REGULAR
 ) {
     val isRunning = endDate == null
+}
+
+enum class DriverType{
+    REGULAR,
+    DISABLED
 }
