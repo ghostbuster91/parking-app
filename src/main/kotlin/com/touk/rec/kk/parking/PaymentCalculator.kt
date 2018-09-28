@@ -4,11 +4,9 @@ import java.math.BigDecimal
 import java.time.Duration
 
 class PaymentCalculator(
-        private val repository: ParkingMeterRepository,
         private val currentTimeProvider: CurrentTimeProvider
 ) {
-    fun calculateTotal(plateNumber: String): BigDecimal {
-        val meterRecord = repository.find(plateNumber) ?: return BigDecimal.ZERO
+    fun calculateTotal(meterRecord: ParkingMeterRecord): BigDecimal {
         val upperTimeLimit = (meterRecord.endDate ?: currentTimeProvider.getCurrentLocalDateTime()).plusMinutes(59)
         val totalHours = Duration.between(meterRecord.startDate, upperTimeLimit).toHours().toInt()
         return (1..totalHours)

@@ -4,7 +4,6 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -19,19 +18,14 @@ class PaymentCalculatorTest(
         private val driverType: DriverType
 ) {
 
-    private val repository = mock<ParkingMeterRepository>()
     private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn (currentTime ?: LocalDateTime.MAX)
     }
-    private val paymentCalculator = PaymentCalculator(repository, currentTimeProvider)
+    private val paymentCalculator = PaymentCalculator(currentTimeProvider)
 
     @Test
     fun `should return correct price for given parking time`() {
-        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime, driverType))
-        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(expectedPrice)
-
-        whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime, driverType))
-        assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(expectedPrice)
+        assert(paymentCalculator.calculateTotal(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime, driverType))).isEqualTo(expectedPrice)
     }
 
     companion object {
