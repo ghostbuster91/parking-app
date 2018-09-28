@@ -11,7 +11,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @RunWith(Parameterized::class)
-class PaymentCalculatorTest(
+class PaymentCalculatorImplTest(
         private val expectedPrice: BigDecimal,
         private val endTime: LocalDateTime?,
         private val currentTime: LocalDateTime?,
@@ -21,7 +21,7 @@ class PaymentCalculatorTest(
     private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn (currentTime ?: LocalDateTime.MAX)
     }
-    private val paymentCalculator = PaymentCalculator(currentTimeProvider)
+    private val paymentCalculator = PaymentCalculatorImpl(currentTimeProvider)
 
     @Test
     fun `should return correct price for given parking time`() {
