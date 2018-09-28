@@ -1,6 +1,5 @@
 package com.touk.rec.kk.parking.app
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.touk.rec.kk.parking.domain.DriverType
 import com.touk.rec.kk.parking.domain.ParkingMeter
 import org.springframework.http.ResponseEntity
@@ -20,7 +19,7 @@ class DriverRestController(private val parkingMeter: ParkingMeter) {
         return ResponseEntity.created(URI.create("/driver/${request.plateNumber}")).body(null)
     }
 
-    data class Request @JsonCreator constructor(
+    data class Request(
             val plateNumber: String,
             val driverType: DriverType
     )
