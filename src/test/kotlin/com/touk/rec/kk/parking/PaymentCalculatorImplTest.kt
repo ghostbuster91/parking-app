@@ -25,7 +25,9 @@ class PaymentCalculatorImplTest(
 
     @Test
     fun `should return correct price for given parking time`() {
-        assert(paymentCalculator.calculateTotal(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime, driverType))).isEqualTo(expectedPrice)
+        val meterRecord = ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime, driverType)
+        assert(paymentCalculator.calculateTotal(meterRecord))
+                .isEqualTo(expectedPrice)
     }
 
     companion object {
