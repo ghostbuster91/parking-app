@@ -1,4 +1,4 @@
-package com.touk.rec.kk.parking
+package com.touk.rec.kk.parking.domain
 
 interface ParkingMeterRepository {
     fun save(parkingMeterRecord: ParkingMeterRecord)

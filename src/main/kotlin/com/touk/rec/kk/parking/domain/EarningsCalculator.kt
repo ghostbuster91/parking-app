@@ -1,4 +1,4 @@
-package com.touk.rec.kk.parking
+package com.touk.rec.kk.parking.domain
 
 import java.math.BigDecimal
 import java.time.LocalDate

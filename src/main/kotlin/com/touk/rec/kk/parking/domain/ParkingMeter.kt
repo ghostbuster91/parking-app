@@ -1,4 +1,4 @@
-package com.touk.rec.kk.parking
+package com.touk.rec.kk.parking.domain
 
 interface ParkingMeter {
     fun checkMeter(plateNumber: String): Boolean

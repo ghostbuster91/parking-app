@@ -1,4 +1,4 @@
-package com.touk.rec.kk.parking
+package com.touk.rec.kk.parking.domain
 
 import assertk.assert
 import assertk.assertions.isEqualTo
