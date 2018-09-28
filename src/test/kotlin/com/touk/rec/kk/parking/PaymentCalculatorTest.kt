@@ -27,7 +27,6 @@ class PaymentCalculatorTest(
 
     @Test
     fun `should return correct price for given parking time`() {
-        val startTime = LocalDateTime.MIN
         whenever(repository.find(PLATE_NUMBER_ONE)).thenReturn(ParkingMeterRecord(PLATE_NUMBER_ONE, startTime, endTime))
         assert(paymentCalculator.calculateTotal(PLATE_NUMBER_ONE)).isEqualTo(expectedPrice)
 
