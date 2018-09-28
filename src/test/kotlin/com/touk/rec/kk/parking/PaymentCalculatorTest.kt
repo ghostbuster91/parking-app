@@ -2,6 +2,7 @@ package com.touk.rec.kk.parking
 
 import assertk.assert
 import assertk.assertions.isEqualTo
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
@@ -11,15 +12,18 @@ import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
 
-
 @RunWith(Parameterized::class)
 class PaymentCalculatorTest(
         private val expectedPrice: BigDecimal,
-        private val endTime: LocalDateTime
+        private val endTime: LocalDateTime?,
+        private val currentTime: LocalDateTime?
 ) {
 
     private val repository = mock<ParkingMeterRepository>()
-    private val paymentCalculator = PaymentCalculator(repository)
+    private val currentTimeProvider = mock<CurrentTimeProvider> {
+        on { getCurrentLocalDateTime() } doReturn (currentTime ?: LocalDateTime.MAX)
+    }
+    private val paymentCalculator = PaymentCalculator(repository, currentTimeProvider)
 
     @Test
     fun `should return correct price for given parking time`() {
@@ -33,20 +37,21 @@ class PaymentCalculatorTest(
 
     companion object {
         private const val PLATE_NUMBER_ONE = "wn1111"
+        private val startTime = LocalDateTime.MIN
 
-        @Parameterized.Parameters
+        @Parameterized.Parameters(name = "{index}: price: {0} endTime: {1} currentTime: {2}")
         @JvmStatic
-        fun data(): List<Array<Any>> {
-            val startTime = LocalDateTime.MIN
+        fun data(): List<Array<Any?>> {
             return listOf(
-                    BigDecimal(1) to startTime.plusMinutes(30),
-                    BigDecimal(1) to startTime.plusHours(1),
-                    BigDecimal(3) to startTime.plusMinutes(61),
-                    BigDecimal(3) to startTime.plusHours(2),
-                    BigDecimal(6) to startTime.plusMinutes(121),
-                    BigDecimal(6) to startTime.plusHours(3),
-                    BigDecimal(10.5) to startTime.plusMinutes(181),
-                    BigDecimal(10.5) to startTime.plusHours(4)
+                    Triple(BigDecimal(1), startTime.plusMinutes(30), null),
+                    Triple(BigDecimal(1), startTime.plusHours(1), null),
+                    Triple(BigDecimal(3), startTime.plusMinutes(61), null),
+                    Triple(BigDecimal(3), startTime.plusHours(2), null),
+                    Triple(BigDecimal(6), startTime.plusMinutes(121), null),
+                    Triple(BigDecimal(6), startTime.plusHours(3), null),
+                    Triple(BigDecimal(10.5), startTime.plusMinutes(181), null),
+                    Triple(BigDecimal(10.5), startTime.plusHours(4), null),
+                    Triple(BigDecimal(1), null, startTime.plusHours(1))
             )
                     .map { it.copy(first = it.first.setScale(2)) }
                     .map { it.toList().toTypedArray() }
@@ -54,10 +59,14 @@ class PaymentCalculatorTest(
     }
 }
 
-class PaymentCalculator(private val repository: ParkingMeterRepository) {
+class PaymentCalculator(
+        private val repository: ParkingMeterRepository,
+        private val currentTimeProvider: CurrentTimeProvider
+) {
     fun calculateTotal(plateNumber: String): BigDecimal {
         val meterRecord = repository.find(plateNumber) ?: return BigDecimal.ZERO
-        val totalHours = Duration.between(meterRecord.startDate, meterRecord.endDate!!.plusMinutes(59)).toHours().toInt()
+        val upperTimeLimit = (meterRecord.endDate ?: currentTimeProvider.getCurrentLocalDateTime()).plusMinutes(59)
+        val totalHours = Duration.between(meterRecord.startDate, upperTimeLimit).toHours().toInt()
         return (1..totalHours)
                 .fold(listOf<BigDecimal>()) { acc, item ->
                     acc + when {
