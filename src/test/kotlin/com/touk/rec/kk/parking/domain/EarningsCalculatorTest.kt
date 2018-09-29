@@ -10,9 +10,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class EarningsCalculatorTest {
-    private val repository = mock<EarningsCalculator.ParkingMeterRepository>()
+    private val repository = mock<EarningsCalculatorImpl.ParkingMeterRepository>()
     private val paymentCalculator = mock<PaymentCalculator>()
-    private val calculator = EarningsCalculator(repository, paymentCalculator)
+    private val calculator = EarningsCalculatorImpl(repository, paymentCalculator)
 
     @Test
     fun `earnings should be equal to zero if there are no completed parking meter records for given day`() {
