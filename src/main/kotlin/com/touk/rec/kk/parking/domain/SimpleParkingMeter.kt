@@ -1,8 +1,11 @@
 package com.touk.rec.kk.parking.domain
 
+import java.math.BigDecimal
+
 class SimpleParkingMeter(
         private val repository: ParkingMeterRepository,
-        private val currentTimeProvider: CurrentTimeProvider
+        private val currentTimeProvider: CurrentTimeProvider,
+        private val paymentCalculator: PaymentCalculator
 ) : ParkingMeter {
 
     override fun startMeter(plateNumber: String, driverType: DriverType) {
@@ -14,5 +17,11 @@ class SimpleParkingMeter(
         val meterRecord = repository.find(plateNumber)
         require(meterRecord?.isRunning ?: false)
         repository.save(meterRecord!!.copy(endDate = currentTimeProvider.getCurrentLocalDateTime()))
+    }
+
+    override fun getTotalCost(plateNumber: String): BigDecimal {
+        return repository.find(plateNumber)
+                ?.let { paymentCalculator.calculateTotal(it) }
+                ?: BigDecimal.ZERO.setScale(2)
     }
 }

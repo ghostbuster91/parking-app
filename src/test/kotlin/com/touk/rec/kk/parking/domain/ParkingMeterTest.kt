@@ -4,10 +4,12 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class ParkingMeterTest {
@@ -16,7 +18,8 @@ class ParkingMeterTest {
         on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
     }
     private val operatorGateway = OperatorGatewayImpl(repository)
-    private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider)
+    private val paymentCalculator = mock<PaymentCalculator>()
+    private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider, paymentCalculator)
 
     @Test
     fun `after starting parking meter it should be started for given plate`() {
@@ -67,6 +70,20 @@ class ParkingMeterTest {
     @Test(expected = IllegalArgumentException::class)
     fun `should throw illegal argument exception when trying to stop not started meter`() {
         parkingManager.stopMeter(PLATE_NUMBER_TOW)
+    }
+
+    @Test
+    fun `should return total cost zero before starting meter`() {
+        val totalCost = parkingManager.getTotalCost(PLATE_NUMBER_ONE)
+        assert(totalCost).isEqualTo(BigDecimal.ZERO.setScale(2))
+    }
+
+    @Test
+    fun `should return proper total cost for recognized plate number`() {
+        startParkingMeter()
+        whenever(paymentCalculator.calculateTotal(any())).thenReturn(BigDecimal.TEN.setScale(2))
+        val totalCost = parkingManager.getTotalCost(PLATE_NUMBER_ONE)
+        assert(totalCost).isEqualTo(BigDecimal.TEN.setScale(2))
     }
 
     private fun startParkingMeter() {
