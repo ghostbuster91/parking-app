@@ -1,5 +1,6 @@
 package com.touk.rec.kk.parking.domain
 
+import assertk.assertions.containsAll
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
@@ -42,5 +43,20 @@ class ParkingMeterRecordServiceTest {
     fun `completedRecords should not return records which are not completed`() {
         whenever(persistentRepository.findAll()).thenReturn(listOf(ParkingMeterRecord("wn111", LocalDateTime.MIN, null, DriverType.REGULAR)))
         assertk.assert(parkingMeterService.getCompletedRecords(LocalDate.MIN)).isEmpty()
+    }
+
+    @Test
+    fun `completedRecords should only return records which were completed at given day`() {
+        val startDate = LocalDateTime.MIN.plusDays(1)
+        whenever(persistentRepository.findAll())
+                .thenReturn(listOf(
+                        ParkingMeterRecord("wn111", startDate, null, DriverType.REGULAR),
+                        ParkingMeterRecord("wn112", startDate, startDate.plusHours(3), DriverType.REGULAR),
+                        ParkingMeterRecord("wn113", startDate.minusDays(1), startDate.plusHours(1), DriverType.REGULAR),
+                        ParkingMeterRecord("wn112", startDate, startDate.plusDays(3), DriverType.REGULAR)))
+        assertk.assert(parkingMeterService.getCompletedRecords(startDate.toLocalDate()))
+                .containsAll(
+                        ParkingMeterRecord("wn112", startDate, startDate.plusHours(3), DriverType.REGULAR),
+                        ParkingMeterRecord("wn113", startDate.minusDays(1), startDate.plusHours(1), DriverType.REGULAR))
     }
 }

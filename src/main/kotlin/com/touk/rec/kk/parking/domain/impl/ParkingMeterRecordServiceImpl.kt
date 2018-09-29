@@ -11,7 +11,7 @@ class ParkingMeterRecordServiceImpl(private val persistentRepository: ParkingMet
     : ParkingMeterRecordService, EarningsCalculatorImpl.ParkingMeterRecordService {
 
     override fun getCompletedRecords(date: LocalDate): List<ParkingMeterRecord> {
-        return persistentRepository.findAll().filter { !it.isRunning() && it.startDate.toLocalDate() == date }
+        return persistentRepository.findAll().filter { it.endDate != null && it.endDate.toLocalDate() == date }
     }
 
     override fun save(parkingMeterRecord: ParkingMeterRecord) {
