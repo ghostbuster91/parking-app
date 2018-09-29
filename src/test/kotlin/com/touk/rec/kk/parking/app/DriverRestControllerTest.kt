@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -44,6 +45,12 @@ class DriverRestControllerTest {
                 .andExpect(status().isBadRequest)
     }
 
+    @Test
+    fun `should return 204 after put on stopMeter`() {
+        mvc.perform(put("/driver/$PLATE_ONE/stopMeter"))
+                .andExpect(status().isNoContent)
+    }
+
     private fun startMeter(plateNumber: String, driverType: DriverType): ResultActions {
         return mvc.perform(post("/driver/startMeter")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +58,7 @@ class DriverRestControllerTest {
     }
 
     companion object {
-        private val PLATE_ONE = "wn1111"
+        private const val PLATE_ONE = "wn1111"
         private val DISABLED_DRIVER = DriverType.DISABLED
     }
 }
