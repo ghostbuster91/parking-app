@@ -6,6 +6,7 @@ import assertk.assertions.isTrue
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import com.touk.rec.kk.parking.domain.impl.OperatorGatewayImpl
 import org.junit.Test
 import java.time.LocalDateTime
 

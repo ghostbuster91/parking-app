@@ -1,5 +1,8 @@
-package com.touk.rec.kk.parking.domain
+package com.touk.rec.kk.parking.domain.impl
 
+import com.touk.rec.kk.parking.domain.EarningsCalculator
+import com.touk.rec.kk.parking.domain.ParkingMeterRecord
+import com.touk.rec.kk.parking.domain.PaymentCalculator
 import java.math.BigDecimal
 import java.time.LocalDate
 

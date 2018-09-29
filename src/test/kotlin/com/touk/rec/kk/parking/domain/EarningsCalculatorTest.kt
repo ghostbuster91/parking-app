@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import com.touk.rec.kk.parking.domain.impl.EarningsCalculatorImpl
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate

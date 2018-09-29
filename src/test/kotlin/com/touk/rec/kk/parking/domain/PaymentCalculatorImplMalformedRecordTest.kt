@@ -2,6 +2,7 @@ package com.touk.rec.kk.parking.domain
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import com.touk.rec.kk.parking.domain.impl.PaymentCalculatorImpl
 import org.junit.Test
 import java.time.LocalDateTime
 

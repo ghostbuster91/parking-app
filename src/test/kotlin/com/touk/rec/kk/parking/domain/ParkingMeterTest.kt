@@ -8,6 +8,8 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import com.touk.rec.kk.parking.domain.impl.OperatorGatewayImpl
+import com.touk.rec.kk.parking.domain.impl.SimpleParkingMeter
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDateTime

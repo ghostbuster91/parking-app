@@ -1,5 +1,6 @@
-package com.touk.rec.kk.parking.domain
+package com.touk.rec.kk.parking.domain.impl
 
+import com.touk.rec.kk.parking.domain.*
 import java.math.BigDecimal
 
 class SimpleParkingMeter(

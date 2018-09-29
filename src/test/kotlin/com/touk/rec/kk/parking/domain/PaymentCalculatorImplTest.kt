@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import com.touk.rec.kk.parking.domain.impl.PaymentCalculatorImpl
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
