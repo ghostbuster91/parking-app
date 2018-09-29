@@ -6,6 +6,7 @@ import assertk.assertions.isGreaterThan
 import com.nhaarman.mockito_kotlin.whenever
 import com.touk.rec.kk.parking.domain.CurrentTimeProvider
 import com.touk.rec.kk.parking.domain.DriverType
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,10 +23,14 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.ResponseExtractor
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTest {
+
+    @Autowired
+    private lateinit var repository: ParkingMeterPersistantRepository
 
     @MockBean
     private lateinit var timeProvider: CurrentTimeProvider
@@ -62,7 +67,7 @@ class IntegrationTest {
     fun `as a driver I can stop parking meter`() {
         val plateNumber = "wn1111"
         startMeter(plateNumber)
-        val response = restTemplate.execute("/driver/$plateNumber/stopMeter", HttpMethod.PUT, RequestCallback {}, ResponseExtractor { it })
+        val response = stopMeter(plateNumber)
         assert(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
 
@@ -74,9 +79,31 @@ class IntegrationTest {
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 
+    @Test
+    fun `as an owner I can check how rich am I`() {
+        startMeter("wn1111")
+        startMeter("wn1122")
+        startMeter("wn1133")
+        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.now().plusHours(4))
+        stopMeter("wn1111")
+        stopMeter("wn1122")
+        stopMeter("wn1133")
+        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", timeProvider.getCurrentLocalDateTime().toLocalDate().toString())
+        assert(response.statusCode).isEqualTo(HttpStatus.OK)
+        assert(response.body.value).isEqualTo(BigDecimal.valueOf(31.50).setScale(2))
+    }
+
     private fun startMeter(plateNumber: String): ResponseEntity<Any> {
         return restTemplate.postForEntity("/driver/startMeter", createJsonRequest(plateNumber))
     }
 
+    private fun stopMeter(plateNumber: String) =
+            restTemplate.execute("/driver/$plateNumber/stopMeter", HttpMethod.PUT, RequestCallback {}, ResponseExtractor { it })
+
     private fun createJsonRequest(plateNumber: String) = DriverRestController.Request(plateNumber, DriverType.REGULAR)
+
+    @After
+    fun tearDown() {
+        repository.deleteAll()
+    }
 }
