@@ -15,9 +15,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.lang.IllegalArgumentException
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(DriverRestController::class)
@@ -32,22 +32,22 @@ class DriverRestControllerTest {
     @Test
     fun `should start parking meter after post on startMeter`() {
         startMeter(PLATE_ONE, DISABLED_DRIVER)
-                .andExpect(MockMvcResultMatchers.status().isCreated)
-                .andExpect(MockMvcResultMatchers.header().string("location", "/driver/$PLATE_ONE"))
+                .andExpect(status().isCreated)
+                .andExpect(header().string("location", "/driver/$PLATE_ONE"))
         verify(parkingMeter).startMeter(PLATE_ONE, DISABLED_DRIVER)
     }
 
     @Test
     fun `should return badRequest when trying to startMeter twice for the same plateNumber`() {
         startMeter(PLATE_ONE, DISABLED_DRIVER)
-                .andExpect(MockMvcResultMatchers.status().isCreated)
+                .andExpect(status().isCreated)
         whenever(parkingMeter.startMeter(any(), any())).thenThrow(IllegalArgumentException())
         startMeter(PLATE_ONE, DISABLED_DRIVER)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(status().isBadRequest)
     }
 
     private fun startMeter(plateNumber: String, driverType: DriverType): ResultActions {
-        return mvc.perform(MockMvcRequestBuilders.post("/driver/startMeter")
+        return mvc.perform(post("/driver/startMeter")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ObjectMapper().writeValueAsString(DriverRestController.Request(plateNumber, driverType))))
     }
