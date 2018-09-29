@@ -51,6 +51,13 @@ class DriverRestControllerTest {
                 .andExpect(status().isNoContent)
     }
 
+    @Test
+    fun `should return badRequest when parking meter throws illegal argument exception during stopMeter`() {
+        whenever(parkingMeter.stopMeter(any())).thenThrow(IllegalArgumentException())
+        mvc.perform(put("/driver/$PLATE_ONE/stopMeter"))
+                .andExpect(status().isBadRequest)
+    }
+
     private fun startMeter(plateNumber: String, driverType: DriverType): ResultActions {
         return mvc.perform(post("/driver/startMeter")
                 .contentType(MediaType.APPLICATION_JSON)
