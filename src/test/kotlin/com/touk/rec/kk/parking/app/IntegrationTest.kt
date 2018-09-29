@@ -39,8 +39,9 @@ class IntegrationTest {
 
     @Test
     fun `as an owner I can check my earnings which are zero at the begging`() {
-        val response = restTemplate.getForEntity<String>("/owner/earnings?date={date}", "2018-09-11")
+        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", "2018-09-11")
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
+        assert(response.body.value).isEqualTo(BigDecimal.ZERO)
     }
 
     @Test
