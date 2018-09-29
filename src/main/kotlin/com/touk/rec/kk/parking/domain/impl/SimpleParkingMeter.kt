@@ -1,8 +1,10 @@
 package com.touk.rec.kk.parking.domain.impl
 
 import com.touk.rec.kk.parking.domain.*
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
+@Component
 class SimpleParkingMeter(
         private val repository: ParkingMeterRepository,
         private val currentTimeProvider: CurrentTimeProvider,

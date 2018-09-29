@@ -4,10 +4,12 @@ import com.touk.rec.kk.parking.domain.CurrentTimeProvider
 import com.touk.rec.kk.parking.domain.DriverType
 import com.touk.rec.kk.parking.domain.ParkingMeterRecord
 import com.touk.rec.kk.parking.domain.PaymentCalculator
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
+@Component
 class PaymentCalculatorImpl(
         private val currentTimeProvider: CurrentTimeProvider
 ) : PaymentCalculator {
