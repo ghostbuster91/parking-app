@@ -17,6 +17,7 @@ import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.ResponseExtractor
@@ -48,7 +49,7 @@ class IntegrationTest {
     fun `as a driver I can start parking meter and check my billing`() {
         val localDateTime = timeProvider.getCurrentLocalDateTime()
         val plateNumber = "wn1111"
-        val startMeterResponse = restTemplate.postForEntity<String>("/driver/startMeter", createJsonRequest(plateNumber))
+        val startMeterResponse = startMeter(plateNumber)
         assert(startMeterResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
         whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(localDateTime.plusHours(3))
@@ -60,9 +61,21 @@ class IntegrationTest {
     @Test
     fun `as a driver I can stop parking meter`() {
         val plateNumber = "wn1111"
-        restTemplate.postForEntity<String>("/driver/startMeter", createJsonRequest(plateNumber))
+        startMeter(plateNumber)
         val response = restTemplate.execute("/driver/$plateNumber/stopMeter", HttpMethod.PUT, RequestCallback {}, ResponseExtractor { it })
         assert(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `as an operator I can checkMeter for given plateNumber`() {
+        val plateNumber = "wn1111"
+        startMeter(plateNumber)
+        val response = restTemplate.getForEntity<Any>("/operator/{plateNumber}", plateNumber)
+        assert(response.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    private fun startMeter(plateNumber: String): ResponseEntity<Any> {
+        return restTemplate.postForEntity("/driver/startMeter", createJsonRequest(plateNumber))
     }
 
     private fun createJsonRequest(plateNumber: String) = DriverRestController.Request(plateNumber, DriverType.REGULAR)
