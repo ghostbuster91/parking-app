@@ -15,7 +15,7 @@ class ParkingMeterTest {
     private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
     }
-    private val operatorGateway = OperatorGateway(repository)
+    private val operatorGateway = OperatorGatewayImpl(repository)
     private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider)
 
     @Test

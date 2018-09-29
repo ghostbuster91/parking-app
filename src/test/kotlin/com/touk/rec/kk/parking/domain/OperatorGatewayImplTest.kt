@@ -9,9 +9,9 @@ import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Test
 import java.time.LocalDateTime
 
-class OperatorGatewayTest {
+class OperatorGatewayImplTest {
     private val repository = mock<ParkingMeterRepository>()
-    private val operatorGateway = OperatorGateway(repository)
+    private val operatorGateway = OperatorGatewayImpl(repository)
 
     @Test
     fun `should return false if there is no record for given plate number`() {
