@@ -15,30 +15,26 @@ class ParkingMeterTest {
     private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
     }
+    private val operatorGateway = OperatorGateway(repository)
     private val parkingManager = SimpleParkingMeter(repository, currentTimeProvider)
-
-    @Test
-    fun `parkingMeter should not be started at the begging`() {
-        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isFalse()
-    }
 
     @Test
     fun `after starting parking meter it should be started for given plate`() {
         startParkingMeter()
-        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isTrue()
+        assert(operatorGateway.checkMeter(PLATE_NUMBER_ONE)).isTrue()
     }
 
     @Test
     fun `after staring parking meter for one car it should not be stared for other`() {
         startParkingMeter()
-        assert(parkingManager.checkMeter(PLATE_NUMBER_TOW)).isFalse()
+        assert(operatorGateway.checkMeter(PLATE_NUMBER_TOW)).isFalse()
     }
 
     @Test
     fun `driver can stop parking meter if it was started`() {
         startParkingMeter()
         parkingManager.stopMeter(PLATE_NUMBER_ONE)
-        assert(parkingManager.checkMeter(PLATE_NUMBER_ONE)).isFalse()
+        assert(operatorGateway.checkMeter(PLATE_NUMBER_ONE)).isFalse()
     }
 
     @Test(expected = IllegalStateException::class)

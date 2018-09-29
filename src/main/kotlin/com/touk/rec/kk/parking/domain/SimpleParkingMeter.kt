@@ -6,13 +6,8 @@ class SimpleParkingMeter(
 ) : ParkingMeter {
 
     override fun startMeter(plateNumber: String, driverType: DriverType) {
-        check(!checkMeter(plateNumber))
+        check(repository.find(plateNumber)?.isRunning?.not() ?: true)
         repository.save(ParkingMeterRecord(plateNumber, currentTimeProvider.getCurrentLocalDateTime(), null, driverType))
-    }
-
-    override fun checkMeter(plateNumber: String): Boolean {
-        val meterRecord = repository.find(plateNumber)
-        return meterRecord?.isRunning ?: false
     }
 
     override fun stopMeter(plateNumber: String) {
