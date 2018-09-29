@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component
 @Component
 class OperatorGatewayImpl(private val repository: ParkingMeterRepository) : OperatorGateway {
     override fun checkMeter(plateNumber: String): Boolean {
-        return repository.find(plateNumber)?.isRunning ?: false
+        return repository.find(plateNumber)?.isRunning() ?: false
     }
 }

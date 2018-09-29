@@ -15,8 +15,11 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.client.postForEntity
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.web.client.RequestCallback
+import org.springframework.web.client.ResponseExtractor
 import java.math.BigDecimal
 
 @RunWith(SpringRunner::class)
@@ -53,6 +56,13 @@ class IntegrationTest {
         assert(billingResponse.body.total).isGreaterThan(BigDecimal.ZERO)
     }
 
-    private fun createJsonRequest(plateNumber: String) = DriverRestController.Request(plateNumber, DriverType.REGULAR)
+    @Test
+    fun `as a driver I can stop parking meter`() {
+        val plateNumber = "wn1111"
+        restTemplate.postForEntity<String>("/driver/startMeter", createJsonRequest(plateNumber))
+        val response = restTemplate.execute("/driver/$plateNumber/stopMeter", HttpMethod.PUT, RequestCallback {}, ResponseExtractor { it })
+        assert(response.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
 
+    private fun createJsonRequest(plateNumber: String) = DriverRestController.Request(plateNumber, DriverType.REGULAR)
 }
