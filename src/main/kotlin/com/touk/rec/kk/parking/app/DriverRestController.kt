@@ -3,10 +3,8 @@ package com.touk.rec.kk.parking.app
 import com.touk.rec.kk.parking.domain.DriverType
 import com.touk.rec.kk.parking.domain.ParkingMeter
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.lang.IllegalArgumentException
 import java.net.URI
 
 @RestController
@@ -23,4 +21,9 @@ class DriverRestController(private val parkingMeter: ParkingMeter) {
             val plateNumber: String,
             val driverType: DriverType
     )
+
+    @ExceptionHandler
+    fun errorHandler(ex: IllegalArgumentException): ResponseEntity<Nothing> {
+        return ResponseEntity.badRequest().body(null)
+    }
 }
