@@ -6,6 +6,7 @@ import assertk.assertions.isGreaterThan
 import com.nhaarman.mockito_kotlin.whenever
 import com.touk.rec.kk.parking.domain.CurrentTimeProvider
 import com.touk.rec.kk.parking.domain.DriverType
+import com.touk.rec.kk.parking.domain.ParkingMeterPersistentRepository
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +31,7 @@ import java.time.LocalDateTime
 class IntegrationTest {
 
     @Autowired
-    private lateinit var repository: ParkingMeterPersistantRepository
+    private lateinit var repository: ParkingMeterPersistentRepository
 
     @MockBean
     private lateinit var timeProvider: CurrentTimeProvider

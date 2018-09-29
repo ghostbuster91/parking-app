@@ -11,7 +11,7 @@ import org.junit.Test
 import java.time.LocalDateTime
 
 class OperatorGatewayImplTest {
-    private val repository = mock<ParkingMeterRepository>()
+    private val repository = mock<ParkingMeterRecordService>()
     private val operatorGateway = OperatorGatewayImpl(repository)
 
     @Test

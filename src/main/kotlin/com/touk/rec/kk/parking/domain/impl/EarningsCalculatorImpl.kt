@@ -9,17 +9,17 @@ import java.time.LocalDate
 
 @Component
 class EarningsCalculatorImpl(
-        private val repository: ParkingMeterRepository,
+        private val recordService: ParkingMeterRecordService,
         private val paymentCalculator: PaymentCalculator
 ) : EarningsCalculator {
     override fun getEarnings(date: LocalDate): BigDecimal {
-        val completedRecords = repository.getCompletedRecords(date)
+        val completedRecords = recordService.getCompletedRecords(date)
         return completedRecords
                 .map { paymentCalculator.calculateTotal(it) }
                 .fold(BigDecimal.ZERO) { acc, item -> acc + item }
     }
 
-    interface ParkingMeterRepository {
+    interface ParkingMeterRecordService {
         fun getCompletedRecords(date: LocalDate): List<ParkingMeterRecord>
     }
 }

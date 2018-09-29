@@ -1,6 +1,6 @@
 package com.touk.rec.kk.parking.domain
 
-interface ParkingMeterRepository {
+interface ParkingMeterRecordService {
     fun save(parkingMeterRecord: ParkingMeterRecord)
     fun find(plateNumber: String): ParkingMeterRecord?
 }

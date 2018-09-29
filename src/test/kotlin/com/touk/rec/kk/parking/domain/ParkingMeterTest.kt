@@ -15,7 +15,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class ParkingMeterTest {
-    private val repository = InMemoryParkingMeterRepository()
+    private val repository = InMemoryParkingMeterRecordService()
     private val currentTimeProvider = mock<CurrentTimeProvider> {
         on { getCurrentLocalDateTime() } doReturn LocalDateTime.MIN
     }
@@ -98,7 +98,7 @@ class ParkingMeterTest {
     }
 }
 
-private class InMemoryParkingMeterRepository : ParkingMeterRepository {
+private class InMemoryParkingMeterRecordService : ParkingMeterRecordService {
     private val data = mutableMapOf<String, ParkingMeterRecord>()
 
     override fun save(parkingMeterRecord: ParkingMeterRecord) {

@@ -1,12 +1,12 @@
 package com.touk.rec.kk.parking.domain.impl
 
 import com.touk.rec.kk.parking.domain.OperatorGateway
-import com.touk.rec.kk.parking.domain.ParkingMeterRepository
+import com.touk.rec.kk.parking.domain.ParkingMeterRecordService
 import org.springframework.stereotype.Component
 
 @Component
-class OperatorGatewayImpl(private val repository: ParkingMeterRepository) : OperatorGateway {
+class OperatorGatewayImpl(private val recordService: ParkingMeterRecordService) : OperatorGateway {
     override fun checkMeter(plateNumber: String): Boolean {
-        return repository.find(plateNumber)?.isRunning() ?: false
+        return recordService.find(plateNumber)?.isRunning() ?: false
     }
 }

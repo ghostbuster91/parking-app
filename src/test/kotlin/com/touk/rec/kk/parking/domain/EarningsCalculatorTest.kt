@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class EarningsCalculatorTest {
-    private val repository = mock<EarningsCalculatorImpl.ParkingMeterRepository>()
+    private val repository = mock<EarningsCalculatorImpl.ParkingMeterRecordService>()
     private val paymentCalculator = mock<PaymentCalculator>()
     private val calculator = EarningsCalculatorImpl(repository, paymentCalculator)
 
