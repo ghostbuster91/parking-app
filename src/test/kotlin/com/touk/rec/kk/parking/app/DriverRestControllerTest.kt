@@ -38,9 +38,7 @@ class DriverRestControllerTest {
     }
 
     @Test
-    fun `should return badRequest when trying to startMeter twice for the same plateNumber`() {
-        startMeter(PLATE_ONE, DISABLED_DRIVER)
-                .andExpect(status().isCreated)
+    fun `should return badRequest when parking meter throws illegal argument exception during startingMeter`() {
         whenever(parkingMeter.startMeter(any(), any())).thenThrow(IllegalArgumentException())
         startMeter(PLATE_ONE, DISABLED_DRIVER)
                 .andExpect(status().isBadRequest)
