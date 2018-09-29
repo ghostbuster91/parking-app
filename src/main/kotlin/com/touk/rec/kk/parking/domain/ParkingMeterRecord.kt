@@ -3,6 +3,7 @@ package com.touk.rec.kk.parking.domain
 import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.Transient
 
 @Entity
 data class ParkingMeterRecord(
@@ -12,10 +13,11 @@ data class ParkingMeterRecord(
         val endDate: LocalDateTime?,
         val driverType: DriverType
 ) {
+    @Transient
     val isRunning = endDate == null
 }
 
-enum class DriverType{
+enum class DriverType {
     REGULAR,
     DISABLED
 }
