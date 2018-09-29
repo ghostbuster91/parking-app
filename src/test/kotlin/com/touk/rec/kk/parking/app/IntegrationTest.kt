@@ -24,7 +24,9 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.ResponseExtractor
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,12 +43,12 @@ class IntegrationTest {
 
     @Before
     fun setUp() {
-        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(CurrentTimeProviderImpl().getCurrentLocalDateTime())
+        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(A_DATETIME)
     }
 
     @Test
     fun `as an owner I can check my earnings which are zero at the begging`() {
-        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", "2018-09-11")
+        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", A_DATETIME.toLocalDate())
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
         assert(response.body.value).isEqualTo(BigDecimal.ZERO)
     }
@@ -85,11 +87,12 @@ class IntegrationTest {
         startMeter("wn1111")
         startMeter("wn1122")
         startMeter("wn1133")
-        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.now().plusHours(4))
+        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(A_DATETIME.plusHours(4))
         stopMeter("wn1111")
         stopMeter("wn1122")
         stopMeter("wn1133")
-        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", timeProvider.getCurrentLocalDateTime().toLocalDate().toString())
+        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}",
+                A_DATETIME.toLocalDate())
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
         assert(response.body.value).isEqualTo(BigDecimal.valueOf(31.50).setScale(2))
     }
@@ -106,5 +109,9 @@ class IntegrationTest {
     @After
     fun tearDown() {
         repository.deleteAll()
+    }
+
+    companion object {
+        private val A_DATETIME = LocalDateTime.of(LocalDate.of(2018, 11, 11), LocalTime.of(16, 30))
     }
 }
