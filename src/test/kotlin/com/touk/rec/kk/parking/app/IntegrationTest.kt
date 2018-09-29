@@ -18,7 +18,6 @@ import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,7 +31,7 @@ class IntegrationTest {
 
     @Before
     fun setUp() {
-        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(LocalDateTime.now())
+        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(CurrentTimeProviderImpl().getCurrentLocalDateTime())
     }
 
     @Test
@@ -43,9 +42,8 @@ class IntegrationTest {
 
     @Test
     fun `as a driver I can start parking meter and check my billing`() {
+        val localDateTime = timeProvider.getCurrentLocalDateTime()
         val plateNumber = "wn1111"
-        val localDateTime = LocalDateTime.now()
-        whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(localDateTime)
         val startMeterResponse = restTemplate.postForEntity<String>("/driver/startMeter", createJsonRequest(plateNumber))
         assert(startMeterResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
