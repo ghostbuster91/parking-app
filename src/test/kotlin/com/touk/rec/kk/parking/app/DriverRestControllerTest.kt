@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import com.touk.rec.kk.parking.domain.*
+import com.touk.rec.kk.parking.domain.DriverType
+import com.touk.rec.kk.parking.domain.ParkingMeter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
@@ -17,10 +20,11 @@ import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 @RunWith(SpringRunner::class)
-@WebMvcTest(DriverRestController::class)
+@SpringBootTest(classes = [DriverRestController::class])
+@AutoConfigureWebMvc
+@AutoConfigureMockMvc
 class DriverRestControllerTest {
 
     @MockBean
