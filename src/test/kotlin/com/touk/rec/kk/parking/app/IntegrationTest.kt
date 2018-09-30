@@ -4,6 +4,9 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import com.nhaarman.mockito_kotlin.whenever
+import com.touk.rec.kk.parking.app.DriverRestController.BillingResponse
+import com.touk.rec.kk.parking.app.DriverRestController.Request
+import com.touk.rec.kk.parking.app.OwnerRestController.EarningsResponse
 import com.touk.rec.kk.parking.domain.CurrentTimeProvider
 import com.touk.rec.kk.parking.domain.DriverType
 import com.touk.rec.kk.parking.domain.ParkingMeterPersistentRepository
@@ -48,7 +51,7 @@ class IntegrationTest {
 
     @Test
     fun `as an owner I can check my earnings which are zero at the begging`() {
-        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}", A_DATETIME.toLocalDate())
+        val response = restTemplate.getForEntity<EarningsResponse>("/owner/earnings?date={date}", A_DATETIME.toLocalDate())
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
         assert(response.body.value).isEqualTo(BigDecimal.ZERO)
     }
@@ -61,7 +64,7 @@ class IntegrationTest {
         assert(startMeterResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
         whenever(timeProvider.getCurrentLocalDateTime()).thenReturn(localDateTime.plusHours(3))
-        val billingResponse = restTemplate.getForEntity<DriverRestController.BillingResponse>("/driver/{plateNumber}", plateNumber)
+        val billingResponse = restTemplate.getForEntity<BillingResponse>("/driver/{plateNumber}", plateNumber)
         assert(billingResponse.statusCode).isEqualTo(HttpStatus.OK)
         assert(billingResponse.body.total).isGreaterThan(BigDecimal.ZERO)
     }
@@ -91,7 +94,7 @@ class IntegrationTest {
         stopMeter("wn1111")
         stopMeter("wn1122")
         stopMeter("wn1133")
-        val response = restTemplate.getForEntity<OwnerRestController.EarningsResponse>("/owner/earnings?date={date}",
+        val response = restTemplate.getForEntity<EarningsResponse>("/owner/earnings?date={date}",
                 A_DATETIME.toLocalDate())
         assert(response.statusCode).isEqualTo(HttpStatus.OK)
         assert(response.body.value).isEqualTo(BigDecimal.valueOf(31.50).setScale(2))
@@ -104,7 +107,7 @@ class IntegrationTest {
     private fun stopMeter(plateNumber: String) =
             restTemplate.execute("/driver/$plateNumber/stopMeter", HttpMethod.PUT, RequestCallback {}, ResponseExtractor { it })
 
-    private fun createJsonRequest(plateNumber: String) = DriverRestController.Request(plateNumber, DriverType.REGULAR)
+    private fun createJsonRequest(plateNumber: String) = Request(plateNumber, DriverType.REGULAR)
 
     @After
     fun tearDown() {
